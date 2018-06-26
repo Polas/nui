@@ -31,17 +31,33 @@
     NSAssert1(path != nil, @"File \"%@\" does not exist", fileName);
     NSString* content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
     NUIStyleSheet *styleSheet = [self parse:content];
-    return [self consolidateRuleSets:styleSheet];
+    return [self consolidateRuleSets:styleSheet andModifiers:Nil];
+}
+
+- (NSMutableDictionary*)getStylesFromFile:(NSString*)fileName andModifiers:(NSString*)modifiersFileName
+{
+    NSString* path = [[NSBundle mainBundle] pathForResource:fileName ofType:@"nss"];
+    NSAssert1(path != nil, @"File \"%@\" does not exist", fileName);
+    NSString* content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+    NUIStyleSheet *styleSheet = [self parse:content];
+    
+    
+    NSString* modifiersPath = [[NSBundle mainBundle] pathForResource:modifiersFileName ofType:@"nss"];
+    NSAssert1(modifiersPath != nil, @"File \"%@\" does not exist", modifiersFileName);
+    NSString* modifiersContent = [NSString stringWithContentsOfFile:modifiersPath encoding:NSUTF8StringEncoding error:nil];
+    NUIStyleSheet *styleSheetModifiers = [self parse:modifiersContent];
+    
+    return [self consolidateRuleSets:styleSheet andModifiers:styleSheetModifiers];
 }
 
 - (NSMutableDictionary*)getStylesFromPath:(NSString*)path
 {
     NSString* content = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
     NUIStyleSheet *styleSheet = [self parse:content];
-    return [self consolidateRuleSets:styleSheet];
+    return [self consolidateRuleSets:styleSheet andModifiers:Nil];
 }
 
-- (NSMutableDictionary*)consolidateRuleSets:(NUIStyleSheet *)styleSheet
+- (NSMutableDictionary*)consolidateRuleSets:(NUIStyleSheet *)styleSheet andModifiers:(NUIStyleSheet*)modifiers
 {
     [NUIRenderer setRerenderOnOrientationChange:NO];
     
@@ -53,6 +69,15 @@
             definitions[definition.variable] = definition.value;
     }
     
+    if (modifiers != Nil){
+        for (NUIDefinition *definition in modifiers.definitions) {
+            if ([self mediaOptionsSatisified:definition.mediaOptions])
+                definitions[definition.variable] = definition.value;
+        }
+    }
+    
+    
+    //FIXME: merge ruleSets too
     for (NUIRuleSet *ruleSet in styleSheet.ruleSets) {
         if (![self mediaOptionsSatisified:ruleSet.mediaOptions])
             continue;

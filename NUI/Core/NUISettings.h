@@ -28,6 +28,7 @@
 
 + (void)init;
 + (void)initWithStylesheet:(NSString*)name;
++ (void)initWithStylesheet:(NSString *)name withModifiers:(NSString*)modifiersName;
 + (void)appendStylesheet:(NSString*)name;
 + (void)loadStylesheetByPath:(NSString*)path;
 + (BOOL)reloadStylesheetsOnOrientationChange:(UIInterfaceOrientation)orientation;

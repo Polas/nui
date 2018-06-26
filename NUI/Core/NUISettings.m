@@ -35,6 +35,17 @@ static NUISettings *instance = nil;
     [NUIAppearance init];
 }
 
++ (void)initWithStylesheet:(NSString *)name withModifiers:(NSString*)modifiersName{
+    instance = [self getInstance];
+    instance.stylesheetName = name;
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    instance.stylesheetOrientation = [self stylesheetOrientationFromInterfaceOrientation:orientation];
+    NUIStyleParser *parser = [[NUIStyleParser alloc] init];
+    instance.styles = [parser getStylesFromFile:name andModifiers:modifiersName];
+    
+    [NUIAppearance init];
+}
+
 + (void)appendStylesheet:(NSString *)name
 {
     instance = [self getInstance];
