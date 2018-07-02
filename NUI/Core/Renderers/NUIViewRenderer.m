@@ -50,7 +50,7 @@
     
     if ([NUISettings hasProperty:@"corner-radius" withClass:className]) {
         [layer setCornerRadius:[NUISettings getFloat:@"corner-radius" withClass:className]];
-        layer.masksToBounds = NO;
+        layer.masksToBounds = YES;
     }
 }
 
