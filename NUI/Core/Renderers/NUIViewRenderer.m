@@ -7,6 +7,8 @@
 //
 
 #import "NUIViewRenderer.h"
+#import "UIView+NUI.h"
+#import "NUIGraphics.h"
 
 @implementation NUIViewRenderer
 
@@ -21,9 +23,13 @@
     } else if ([NUISettings hasProperty:@"background-color" withClass:className]) {
         [view setBackgroundColor: [NUISettings getColor:@"background-color" withClass: className]];
     }
+    if ([NUISettings hasProperty:@"tint-color" withClass:className]) {
+        [view setTintColor:[NUISettings getColor:@"tint-color" withClass: className]];
+    }
 
     [self renderSize:view withClass:className];
     [self renderBorder:view withClass:className];
+    [self renderGradient:view withClass:className];
     [self renderShadow:view withClass:className];
 }
 
@@ -50,7 +56,11 @@
     
     if ([NUISettings hasProperty:@"corner-radius" withClass:className]) {
         [layer setCornerRadius:[NUISettings getFloat:@"corner-radius" withClass:className]];
-        layer.masksToBounds = YES;
+        BOOL clip = YES;
+        if ([NUISettings hasProperty:@"clip" withClass:className]) {
+            clip = [NUISettings getBoolean:@"clip" withClass:className];
+        }
+        layer.masksToBounds = clip;
     }
 }
 
@@ -91,6 +101,43 @@
         view.frame = CGRectMake(view.frame.origin.x, view.frame.origin.y, width, height);
     }
 }
+
++ (void)renderGradient:(UIView*)view withClass:(NSString*)className
+{
+    if ([NUISettings hasProperty:@"background-color-top" withClass:className]) {
+        CAGradientLayer *gradientLayer = [NUIGraphics
+                                          gradientLayerWithTop:[NUISettings getColor:@"background-color-top" withClass:className]
+                                          bottom:[NUISettings getColor:@"background-color-bottom" withClass:className]
+                                          frame:view.bounds];
+        
+        if ([NUISettings hasProperty:@"corner-radius" withClass:className]) {
+            [gradientLayer setCornerRadius:[NUISettings getFloat:@"corner-radius" withClass:className]];
+            BOOL clip = YES;
+            if ([NUISettings hasProperty:@"clip" withClass:className]) {
+                clip = [NUISettings getBoolean:@"clip" withClass:className];
+            }
+            gradientLayer.masksToBounds = clip;
+        }
+        
+        if ([NUISettings hasProperty:@"gradient-start-point" withClass:className]){
+            UIOffset startPoint = [NUISettings getOffset:@"gradient-start-point" withClass:className];
+            UIOffset endPoint = [NUISettings getOffset:@"gradient-end-point" withClass:className];
+            
+            gradientLayer.startPoint = CGPointMake(startPoint.horizontal, startPoint.vertical);
+            gradientLayer.endPoint = CGPointMake(endPoint.horizontal, endPoint.vertical);
+        }
+        
+        if (view.gradientLayer) {
+            [view.layer replaceSublayer:view.gradientLayer with:gradientLayer];
+        } else {
+//            int backgroundLayerIndex = [view.layer.sublayers count] == 1 ? 0 : 1;
+            [view.layer insertSublayer:gradientLayer atIndex:0];
+        }
+        
+        view.gradientLayer = gradientLayer;
+    }
+}
+
 
 + (BOOL)hasShadowProperties:(UIView*)view withClass:(NSString*)className {
     

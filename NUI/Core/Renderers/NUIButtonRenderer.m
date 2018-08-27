@@ -54,22 +54,7 @@
         [button setBackgroundImage:[NUISettings getImageFromColor:@"background-color-disabled" withClass:className] forState:UIControlStateDisabled];
     }
     
-    // Set background gradient
-    if ([NUISettings hasProperty:@"background-color-top" withClass:className]) {
-        CAGradientLayer *gradientLayer = [NUIGraphics
-                                          gradientLayerWithTop:[NUISettings getColor:@"background-color-top" withClass:className]
-                                          bottom:[NUISettings getColor:@"background-color-bottom" withClass:className]
-                                          frame:button.bounds];
-        
-        if (button.gradientLayer) {
-            [button.layer replaceSublayer:button.gradientLayer with:gradientLayer];
-        } else {
-            int backgroundLayerIndex = [button.layer.sublayers count] == 1 ? 0 : 1;
-            [button.layer insertSublayer:gradientLayer atIndex:backgroundLayerIndex];
-        }
-        
-        button.gradientLayer = gradientLayer;
-    }
+    [NUIViewRenderer renderGradient:button withClass:className];
     
     // Set background image
     if ([NUISettings hasProperty:@"background-image" withClass:className]) {

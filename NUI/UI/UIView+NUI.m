@@ -91,4 +91,14 @@
     return [nuiAppliedFlagNumber boolValue];
 }
 
+- (void)setGradientLayer:(CALayer *)gradientLayer
+{
+    objc_setAssociatedObject(self, kNUIAssociatedGradientLayerKey, gradientLayer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (CALayer *)gradientLayer
+{
+    return objc_getAssociatedObject(self, kNUIAssociatedGradientLayerKey);
+}
+
 @end
