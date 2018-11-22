@@ -23,7 +23,7 @@
     } else if ([NUISettings hasProperty:@"background-color" withClass:className]) {
         [view setBackgroundColor: [NUISettings getColor:@"background-color" withClass: className]];
     }
-    if ([NUISettings hasProperty:@"tint-color" withClass:className]) {
+    if ([NUISettings hasProperty:@"rateStar" withClass:className]) {
         [view setTintColor:[NUISettings getColor:@"tint-color" withClass: className]];
     }
 
@@ -56,11 +56,17 @@
     
     if ([NUISettings hasProperty:@"corner-radius" withClass:className]) {
         [layer setCornerRadius:[NUISettings getFloat:@"corner-radius" withClass:className]];
-        BOOL clip = YES;
-        if ([NUISettings hasProperty:@"clip" withClass:className]) {
-            clip = [NUISettings getBoolean:@"clip" withClass:className];
-        }
+
+    }
+    
+    if ([NUISettings hasProperty:@"clip" withClass:className]){
+        Boolean clip = [NUISettings getBoolean:@"clip" withClass:className];
         layer.masksToBounds = clip;
+    }
+    
+    
+    if ([NUISettings hasProperty:@"round" withClass:className]){
+        [layer setCornerRadius: layer.frame.size.width / 2];
     }
 }
 
@@ -118,6 +124,7 @@
             }
             gradientLayer.masksToBounds = clip;
         }
+        
         
         if ([NUISettings hasProperty:@"gradient-start-point" withClass:className]){
             UIOffset startPoint = [NUISettings getOffset:@"gradient-start-point" withClass:className];
