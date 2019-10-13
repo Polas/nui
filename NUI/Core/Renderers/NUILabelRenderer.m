@@ -133,7 +133,32 @@
     for (NSDictionary *attribute in attributes) {
         [transformedAttributedText setAttributes:attribute[@"attrs"] range:[attribute[@"range"] rangeValue]];
     }
-
+    
+    if ([NUISettings hasProperty:@"font-letter-spacing" withClass:className]) {
+        float spacing = [NUISettings getFloat:@"font-letter-spacing" withClass:className];
+        [transformedAttributedText addAttribute:NSKernAttributeName
+                                 value:@(spacing)
+                                 range:NSMakeRange(0, [transformedAttributedText length])];
+    }
+    
+    if ([NUISettings hasProperty:@"font-name" withClass:className]) {
+        NSString* fontName = [NUISettings get:@"font-name" withClass:className];
+        float size = 20;
+        if ([NUISettings hasProperty:@"font-size" withClass:className]){
+            size = [NUISettings getFloat:@"font-size" withClass:className];
+        }
+        [transformedAttributedText addAttribute:NSFontAttributeName
+                                          value:[UIFont fontWithName:fontName size:size]
+                                          range:NSMakeRange(0, [transformedAttributedText length])];
+    }
+    
+    if ([NUISettings hasProperty:@"font-color" withClass:className]){
+        UIColor * color = [NUISettings getColor:@"font-color" withClass:className];
+        [transformedAttributedText addAttribute:NSForegroundColorAttributeName
+                                          value:color
+                                          range:NSMakeRange(0, [transformedAttributedText length])];
+    }
+    
     return transformedAttributedText;
 }
 

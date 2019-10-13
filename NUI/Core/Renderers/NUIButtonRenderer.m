@@ -106,6 +106,7 @@
     // Set font color
     if ([NUISettings hasProperty:@"font-color" withClass:className]) {
         [button setTitleColor:[NUISettings getColor:@"font-color" withClass:className] forState:UIControlStateNormal];
+        button.titleLabel.textColor = [NUISettings getColor:@"font-color" withClass:className];
     }
     if ([NUISettings hasProperty:@"font-color-highlighted" withClass:className]) {
         [button setTitleColor:[NUISettings getColor:@"font-color-highlighted" withClass:className] forState:UIControlStateHighlighted];
@@ -151,6 +152,42 @@
     // content insets
     if ([NUISettings hasProperty:@"content-insets" withClass:className]) {
         [button setContentEdgeInsets:[NUISettings getEdgeInsets:@"content-insets" withClass:className]];
+    }
+    
+    if ([NUISettings hasProperty:@"title" withClass:className]) {
+        NSString* titleType = [NUISettings get:@"title" withClass:className];
+        NSString* text = @"";
+        if (button.titleLabel.text != nil && [button.titleLabel.text length] > 0){
+            text = button.titleLabel.text;
+        }else if (button.titleLabel.attributedText != nil && [button.titleLabel.attributedText.string length] > 0){
+            text = button.titleLabel.attributedText.string;
+        }
+        text = [NUIRenderer transformText:text withClass:className];
+
+        
+        
+        if ([titleType isEqualToString:@"attributed"]){
+            [button setTitle:NULL forState:UIControlStateNormal];
+            [button setTitle:NULL forState:UIControlStateSelected];
+            [button setTitle:NULL forState:UIControlStateHighlighted];
+
+            NSAttributedString * attrString = [NUIRenderer transformAttributedText:
+                                               [[NSAttributedString alloc]initWithString:text]
+                                                                         withClass:className];
+            [button setAttributedTitle:attrString forState:UIControlStateNormal];
+            [button setAttributedTitle:attrString forState:UIControlStateSelected];
+            [button setAttributedTitle:attrString forState:UIControlStateHighlighted];
+
+        }else{
+            [button setAttributedTitle: NULL forState:UIControlStateNormal];
+            [button setAttributedTitle: NULL forState:UIControlStateSelected];
+            [button setAttributedTitle: NULL forState:UIControlStateHighlighted];
+
+            [button setTitle:text forState:UIControlStateNormal];
+            [button setTitle:text forState:UIControlStateSelected];
+            [button setTitle:text forState:UIControlStateHighlighted];
+
+        }
     }
     
     [NUIViewRenderer renderBorder:button withClass:className];
